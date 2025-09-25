@@ -145,3 +145,17 @@ func NewSubtrainerRegistrationServices(db *gorm.DB, reqVal model.ReqnewSubtraine
 	return true, "Successfully Registered"
 
 }
+
+func GetSubtrainerRegistrationServices(db *gorm.DB, reqVal model.ReqGetSubtrainerRegistrationModel) (bool, string, []model.SubtrainerListModel) {
+	log := logger.InitLogger()
+
+	var ListSubtrainerData []model.SubtrainerListModel
+
+	ListSubtrainerDataErr := db.Raw(query.ListSubtrainerSQL, reqVal.Id).Scan(&ListSubtrainerData).Error
+	if ListSubtrainerDataErr != nil {
+		log.Error(ListSubtrainerDataErr.Error())
+		return false, "Something went wrong, Try Again", []model.SubtrainerListModel{}
+	}
+
+	return true, "Successfully data fetched", ListSubtrainerData
+}
