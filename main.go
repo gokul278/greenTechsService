@@ -67,10 +67,59 @@ func main() {
 	routes.InitFileHandlerRoutes(r)
 	fmt.Println()
 
-	//File Handler
+	//Sub  Trainer
 	fmt.Println("=================Sub Trainer=================")
 	fmt.Println()
 	routes.InitSubtrainerRoutes(r)
+	fmt.Println()
+
+	//Groups
+	fmt.Println("=================Groups=================")
+	fmt.Println()
+	routes.InitGroupsRoutes(r)
+	fmt.Println()
+
+	//Student
+	fmt.Println("=================Student=================")
+	fmt.Println()
+	routes.InitStudentRoutes(r)
+	fmt.Println()
+
+	//Filter
+	fmt.Println("=================Filter=================")
+	fmt.Println()
+	routes.InitFilterRoutes(r)
+	fmt.Println()
+
+	//Syllabus
+	fmt.Println("=================Syllabus=================")
+	fmt.Println()
+	routes.InitSyllabusRoutes(r)
+	fmt.Println()
+
+	//Session
+	fmt.Println("=================Session=================")
+	fmt.Println()
+	routes.InitSessionRoutes(r)
+	fmt.Println()
+
+	//Permission
+	fmt.Println("=================Permission=================")
+	fmt.Println()
+	routes.InitPermissionRoutes(r)
+	fmt.Println()
+
+	//Leave
+	fmt.Println("=================Leave=================")
+	fmt.Println()
+	routes.InitLeaveRoutes(r)
+	fmt.Println()
+
+	//Permission Request
+	fmt.Println("=================Permission Request=================")
+	fmt.Println()
+	routes.InitPermissionRequestRoutes(r)
+	fmt.Println()
 
 	fmt.Println()
 	fmt.Println()

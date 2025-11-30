@@ -146,6 +146,109 @@ func NewSubtrainerRegistrationServices(db *gorm.DB, reqVal model.ReqnewSubtraine
 
 }
 
+func EditSubtrainerRegistrationServices(db *gorm.DB, reqVal model.ReqEditSubtrainerRegistrationModel, idValue int) (bool, string) {
+	log := logger.InitLogger()
+
+	tx := db.Begin()
+	if tx.Error != nil {
+		log.Printf("ERROR: Failed to begin transaction: %v\n", tx.Error)
+		return false, "Something went wrong, Try Again"
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error("ERROR: Recovered from panic, rolling back transaction:", r)
+			tx.Rollback()
+		}
+	}()
+
+	_, _, userVal := GetSubtrainerRegistrationServices(db, model.ReqGetSubtrainerRegistrationModel{
+		Id: reqVal.Id,
+	})
+
+	//checkEmail and Mobile Number is Already Registered
+	var checkEmail model.CheckemailPhoneNumberModel
+	checkEmailErr := tx.Raw(query.Checkmailphonenumber, reqVal.Emailid, reqVal.Phonenumber).Scan(&checkEmail).Error
+	if checkEmailErr != nil {
+		log.Error(checkEmailErr.Error())
+		return false, "Something went wrong, Try Again"
+	}
+
+	//Check Email Already Exits
+	switch checkEmail.IsEmailExist {
+	case true:
+		if userVal[0].RefUCMail != reqVal.Emailid {
+			return false, "Email Already Exits"
+		} else {
+			break
+		}
+	case false:
+		break
+	}
+
+	//Phone Number Already Exits
+	switch checkEmail.IsPhoneNumberExist {
+	case true:
+		if userVal[0].RefUCMobileno != reqVal.Phonenumber {
+			return false, "Phone Number Already Exits"
+		} else {
+			break
+		}
+	case false:
+		break
+	}
+
+	//Updating the User Table
+	userDataErr := tx.Exec(
+		query.UpdateSubtrainerUserSQL,
+		reqVal.Fullname,
+		reqVal.UserStatus,
+		reqVal.Dob,
+		reqVal.ProfileImage,
+		timeZone.GetPacificTime(),
+		idValue,
+		reqVal.Id,
+	).Error
+	if userDataErr != nil {
+		log.Error(userDataErr.Error())
+		return false, "Something went wrong, Try Again"
+	}
+
+	//Updating Communication
+	communicationDataErr := tx.Exec(
+		query.UpdateSubtrianerCommunicationSQL,
+		reqVal.CurrentLocation,
+		reqVal.Phonenumber,
+		reqVal.Id,
+	).Error
+	if communicationDataErr != nil {
+		log.Error(communicationDataErr.Error())
+		return false, "Something went wrong, Try Again"
+	}
+
+	//Updating the Sub Trainer Domain
+	SubtrainerDomainDataErr := tx.Exec(
+		query.UpdateSubtrainerDomainSQL,
+		reqVal.Workexprience,
+		reqVal.Aadhar,
+		reqVal.Resume,
+		reqVal.Id,
+	).Error
+	if SubtrainerDomainDataErr != nil {
+		log.Error(SubtrainerDomainDataErr.Error())
+		return false, "Something went wrong, Try Again"
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		log.Printf("ERROR: Failed to commit transaction: %v\n", err)
+		tx.Rollback()
+		return false, "Something went wrong, Try Again"
+	}
+
+	return true, "Successfully Registered"
+
+}
+
 func GetSubtrainerRegistrationServices(db *gorm.DB, reqVal model.ReqGetSubtrainerRegistrationModel) (bool, string, []model.SubtrainerListModel) {
 	log := logger.InitLogger()
 

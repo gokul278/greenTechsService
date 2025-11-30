@@ -10,5 +10,6 @@ import (
 func InitSubtrainerRoutes(router *gin.Engine) {
 	route := router.Group("/api/v1/subtrainer")
 	route.POST("/new", accesstoken.JWTMiddleware(), controllers.NewSubtrainerRegistrationController())
+	route.POST("/edit", accesstoken.JWTMiddleware(), controllers.EditSubtrainerRegistrationController())
 	route.POST("/", accesstoken.JWTMiddleware(), controllers.GetSubtrainerRegistrationController())
 }
